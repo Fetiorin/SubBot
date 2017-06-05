@@ -1,0 +1,17 @@
+version: "2"
+services:
+  web:
+    build: .
+    ports:
+      - "8071:8071"
+    volumes:
+      - ~/.ivy2:/root/.ivy2
+      - ~/.sbt:/root/.sbt
+    links:
+      - mongo
+  mongo:
+    image: mongo
+    volumes:
+      - ./scrapp:/data/db
+    ports:
+      - "27017:27017"
