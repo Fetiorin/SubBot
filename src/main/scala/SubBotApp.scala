@@ -12,7 +12,7 @@ import scala.concurrent.duration._
 object SubBotApp extends App with FBRoute {
   val db = DBController
 
-  implicit val actorSystem = ActorSystem("SabBot", ConfigFactory.load)
+  implicit val actorSystem = ActorSystem("SubBot", ConfigFactory.load)
   implicit val materializer = ActorMaterializer()
   implicit val ec = actorSystem.dispatcher
   implicit val server = new FBServer
