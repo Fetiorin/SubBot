@@ -15,15 +15,14 @@ package object fbmodel {
                   default_action: Option[DefaultAction] = None,
                   buttons: Option[List[Button]] = None)
 
- case class DefaultAction(`type`: String,
-                          url: String,
-                          fallback_url: Option[String] = None)
+  case class DefaultAction(`type`: String,
+                           url: String,
+                           fallback_url: Option[String] = None)
 
   case class Button(`type`: Option[String] = None,
                     url: Option[String] = None,
                     title: String,
                     payload: Option[String] = None)
-
 
 
   case class Attachment(`type`: String, payload: Payload)

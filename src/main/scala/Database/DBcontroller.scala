@@ -3,7 +3,7 @@ package subbot.database
 import reactivemongo.api.{DefaultDB, MongoConnection, MongoDriver, QueryOpts}
 import reactivemongo.api.collections.bson.BSONCollection
 import reactivemongo.api.commands.WriteResult
-import reactivemongo.bson.{BSONArray, BSONDateTime, BSONDocument, BSONRegex}
+import reactivemongo.bson.{BSONArray, BSONDateTime, BSONDocument, BSONRegex, BSONString, BSONValue}
 import subbot.config.BotConfig
 
 import scala.concurrent.Future
@@ -86,10 +86,16 @@ object DBController {
   def unsubscribe(user: String, tag: String): Future[WriteResult] =
     subscriptions.remove(BSONDocument("user" -> user, "tag" -> tag))
 
-  def lastArticle = {
+  def lastArticle: Future[String] = {
     articles.find(BSONDocument()).
       sort(BSONDocument("date" -> -1)).
-      one[BSONDocument].map(_.get.get("url").get)
+        one[BSONDocument].map { article =>
+          val url = article.flatMap(_.get("url"))
+          url match {
+            case Some(BSONString(value)) => value
+            case _ => ""
+          }
+        }
   }
 
   private def createConnection(location: String, dbname: String): DefaultDB = {

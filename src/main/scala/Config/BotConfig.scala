@@ -26,19 +26,28 @@ object BotConfig {
     val dbname: String = db.getString("dbname")
     val articles: String = db.getString("articles")
     val subscriptions: String = db.getString("subscriptions")
+
   }
 
   object texts {
     val subscribed = "Теперь вы подписанны на тег: "
     val unsubscribed = "Теперь вы не будете получать новостей по тегу: "
     val allTags = "Теги на которые вы подписаны: "
-    val help = """tag/title <запрос> — поиск новостей по тегу / оглавлению
-                 |subscribe <тег> — подписаться на тег
-                 |unsubscribe <тег> — отписаться от тега
-                 |subscriptions — показать все подписки
-                 |help — это сообщение
-               """.stripMargin
+    val help =
+      """tag/title <запрос> — поиск новостей по тегу / оглавлению
+        |subscribe <тег> — подписаться на тег
+        |unsubscribe <тег> — отписаться от тега
+        |subscriptions — показать все подписки
+        |help — это сообщение
+      """.stripMargin
     val error = "Запрос не поддерживается :("
     val nothingFound = "По запросу ничего не найдено"
   }
+
+  object crawler {
+    private val crawler = botConfig.getConfig("crawler")
+    val urlPostfix: String = crawler.getString("urlPostfix")
+    val overflowRedirect: String = crawler.getString("overflowRedirect")
+  }
+
 }
