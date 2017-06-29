@@ -4,7 +4,7 @@ import reactivemongo.bson.{BSONString, BSONValue}
 import spray.json._
 import subbot.json.fbJson._
 import subbot.json.fbmodel._
-
+import subbot.config.BotConfig.texts._
 
 /**
   * JSON responses creators
@@ -36,11 +36,11 @@ package object MessageCreators {
       message = FBMessage(attachment = Some(
         Attachment(`type` = "template",
           Payload(
-            text = Some("Показать ещё?"),
+            text = Some(moreMessageText),
             template_type = Some("button"),
             buttons = Some(List(
               Button(`type` = Some("postback"),
-                title = "Да",
+                title = moreButtonTitle,
                 payload = Some(payload)))))))))
 
   def createCardMessage(card: Card, id: String) = toBytesWrapper(

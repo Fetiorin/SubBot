@@ -30,6 +30,8 @@ object BotConfig {
   }
 
   object texts {
+    val moreMessageText = "Показать ещё?"
+    val moreButtonTitle = "Да"
     val subscribed = "Теперь вы подписанны на тег: "
     val unsubscribed = "Теперь вы не будете получать новостей по тегу: "
     val allTags = "Теги на которые вы подписаны: "
