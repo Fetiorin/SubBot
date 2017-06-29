@@ -3,7 +3,7 @@ package subbot.database
 import reactivemongo.api.{DefaultDB, MongoConnection, MongoDriver, QueryOpts}
 import reactivemongo.api.collections.bson.BSONCollection
 import reactivemongo.api.commands.WriteResult
-import reactivemongo.bson.{BSONArray, BSONDateTime, BSONDocument, BSONRegex, BSONString, BSONValue}
+import reactivemongo.bson.{BSONArray, BSONDateTime, BSONDocument, BSONRegex, BSONString}
 import subbot.config.BotConfig
 
 import scala.concurrent.Future

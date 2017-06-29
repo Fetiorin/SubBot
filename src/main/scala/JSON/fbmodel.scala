@@ -24,7 +24,6 @@ package object fbmodel {
                     title: String,
                     payload: Option[String] = None)
 
-
   case class Attachment(`type`: String, payload: Payload)
 
   case class FBMessage(mid: Option[String] = None,

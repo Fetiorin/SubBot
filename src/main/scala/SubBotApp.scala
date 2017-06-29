@@ -1,28 +1,29 @@
-import akka.actor.{ActorSystem, Props}
-import akka.http.scaladsl.Http
-import akka.stream.ActorMaterializer
-import com.typesafe.config.ConfigFactory
-import subbot.actors.{Tick, Crawler, Sender, UpdateLastUrl}
+import akka.NotUsed
+import akka.stream.scaladsl.Source
 import subbot.config.BotConfig
 import subbot.database.DBController
-import subbot.server.{FBRoute, FBServer}
+import subbot.server.FBRoute
+import subbot.utils.Article
+import subbot.utils.ScrapUtils._
 
 import scala.concurrent.duration._
 
 object SubBotApp extends App with FBRoute {
   val db = DBController
 
-  implicit val actorSystem = ActorSystem("SubBot", ConfigFactory.load)
-  implicit val materializer = ActorMaterializer()
-  implicit val ec = actorSystem.dispatcher
-  implicit val server = new FBServer
-  implicit val sender = actorSystem.actorOf(Props(new Sender))
+  //possible to add some user-input as a trigger
+  val ScrapTriggers = Source.tick(10 seconds, 40 seconds, NotUsed)
 
-  val crawler = actorSystem.actorOf(Props(new Crawler(sender)))
-  crawler ! UpdateLastUrl
-  actorSystem.scheduler.schedule(5 seconds, 10 minutes, crawler, Tick)
+  ScrapTriggers.runForeach { _ =>
+    Source(notParsedLinks)
+      .map(scrap)
+      .map { article: Article =>
+        notifyUsers(article)
+        addToDB(article)
+      }.runForeach { _ => logger.info("Article scrapped") }
+  }
 
-  Http().bindAndHandle(fbRoutes, BotConfig.conn.localhost, BotConfig.conn.port)
+  //Http().bindAndHandle(fbRoutes, BotConfig.conn.localhost, BotConfig.conn.port)
 
   logger.info(s"Subbot started on: ${BotConfig.conn.localhost}")
 }

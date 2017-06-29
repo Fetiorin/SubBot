@@ -8,8 +8,9 @@ import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.stream.ActorMaterializer
+import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.LazyLogging
-import subbot.actors.{Message, More}
+import subbot.utils.SenderUtils._
 import subbot.config.BotConfig.fb
 import subbot.config._
 import subbot.json.fbJson._
@@ -18,9 +19,13 @@ import subbot.json.fbmodel._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-class FBServer(implicit ec: ExecutionContext,
-               system: ActorSystem,
-               materializer: ActorMaterializer) extends LazyLogging {
+trait implicits {
+  implicit val actorSystem = ActorSystem("SubBot", ConfigFactory.load)
+  implicit val materializer = ActorMaterializer()
+  implicit val ec = actorSystem.dispatcher
+}
+
+object FBServer extends LazyLogging with implicits {
 
   def post(body: Array[Byte]): Future[Unit] = {
     val entity = HttpEntity(MediaTypes.`application/json`, body)
@@ -55,18 +60,18 @@ class FBServer(implicit ec: ExecutionContext,
   }
 
 
-  def handleMessage(fbObject: FBPObject, sender: ActorRef):
+  def handleMessage(fbObject: FBPObject):
   (StatusCode, List[HttpHeader], Option[Either[String, String]]) = {
     logger.info(s"Receive fbObject: $fbObject")
     fbObject.entry.foreach {
       entry =>
         entry.messaging.foreach {
             case FBMessageEventIn(_, senderId,_,_,Some(postback)) =>
-              sender ! More(postback.payload, senderId.id)
+              moreArticles(postback.payload, senderId.id)
             case FBMessageEventIn(_, senderId, _, Some(senderMessage), _) =>
               senderMessage.text match {
                 case Some(text) =>
-                  sender ! Message(text, senderId.id)
+                  replyOnMessage(text, senderId.id)
                 case None =>
                   Future.successful(())
               }
@@ -79,20 +84,13 @@ class FBServer(implicit ec: ExecutionContext,
 
 }
 
-trait FBRoute extends LazyLogging {
-
-  protected implicit def actorSystem: ActorSystem
-  protected implicit def ec: ExecutionContext
-  protected implicit val materializer: ActorMaterializer
-  protected val server: FBServer
-  protected val sender: ActorRef
-
+trait FBRoute extends LazyLogging with implicits {
   val fbRoutes: Route = {
     get {
       path("webhook") {
         parameters("hub.verify_token", "hub.mode", "hub.challenge") {
           (token, mode, challenge) =>
-            complete(server.verifyToken(token, mode, challenge))
+            complete(FBServer.verifyToken(token, mode, challenge))
         }
       }
     } ~
@@ -100,7 +98,7 @@ trait FBRoute extends LazyLogging {
         path("webhook") {
           entity(as[FBPObject]) { fbObject =>
             complete {
-              server.handleMessage(fbObject, sender)
+              FBServer.handleMessage(fbObject)
             }
           }
         }

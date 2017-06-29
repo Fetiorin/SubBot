@@ -1,8 +1,8 @@
-package subbot.actors
+package subbot.utils
 
 import reactivemongo.bson.{BSONString, BSONValue}
-import subbot.json.fbJson._
 import spray.json._
+import subbot.json.fbJson._
 import subbot.json.fbmodel._
 
 package object MessageCreators {
@@ -19,7 +19,8 @@ package object MessageCreators {
       default_action = Some(DefaultAction(
         `type` = "web_url",
         url
-      ))
+        )
+      )
     )
   }
 
@@ -30,15 +31,11 @@ package object MessageCreators {
         Attachment(`type` = "template",
           Payload(
             text = Some("Показать ещё?"),
-            template_type = Some("button")
-            ,
+            template_type = Some("button"),
             buttons = Some(List(
               Button(`type` = Some("postback"),
                 title = "Да",
-                payload = Some(payload))))
-          ))))
-    )
-
+                payload = Some(payload)))))))))
 
   def createCardMessage(card: Card, id: String) = toBytesWrapper(
     id = id,
@@ -47,21 +44,20 @@ package object MessageCreators {
         Payload(
           template_type = Some("generic"),
           elements = Some(
-            List(card))))))
-  )
+            List(card)))))))
 
   def createListMessage(cards: List[Card], payload: String, id: String) =
     toBytesWrapper(
       id = id,
       message = FBMessage(attachment = Some(
-        Attachment(`type` = "template",
-          Payload(template_type = Some("generic"), elements = Some(cards))))))
-
+          Attachment(
+          `type` = "template",
+          Payload(template_type = Some("generic"),
+                  elements = Some(cards))))))
 
   def createMessage(text: String, id: String) = toBytesWrapper(
     id = id,
-    message = FBMessage(text = Some(s"$text"), metadata = None)
-  )
+    message = FBMessage(text = Some(s"$text"), metadata = None))
 
   def toBytesWrapper(id: String, message: FBMessage) =
     FBMessageEventOut(recipient = FBRecipient(id),
