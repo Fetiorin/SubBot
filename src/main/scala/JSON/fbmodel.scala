@@ -1,5 +1,10 @@
 package subbot.json
 
+/**
+  * Describes Facebook JSON for bots in case classes.
+  * From: https://developers.facebook.com/docs/messenger-platform
+  */
+
 package object fbmodel {
 
   case class Payload(url: Option[String] = None,

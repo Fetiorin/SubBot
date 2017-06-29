@@ -5,6 +5,12 @@ import spray.json._
 import subbot.json.fbJson._
 import subbot.json.fbmodel._
 
+
+/**
+  * JSON responses creators
+  * From: From: https://developers.facebook.com/docs/messenger-platform
+  */
+
 package object MessageCreators {
 
   def makeCard(article: Map[String, BSONValue]): Card = {

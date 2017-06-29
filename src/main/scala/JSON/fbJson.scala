@@ -3,6 +3,11 @@ package subbot.json
 import spray.json.DefaultJsonProtocol
 import subbot.json.fbmodel._
 
+/**
+  * Describes Facebook JSON formats in spray JsonProtocol, see fbModel for details
+  * of objects structure
+  */
+
 object fbJson extends DefaultJsonProtocol {
 
   implicit val buttonFormat = jsonFormat4(Button)

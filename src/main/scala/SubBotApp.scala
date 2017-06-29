@@ -1,4 +1,5 @@
 import akka.NotUsed
+import akka.http.scaladsl.Http
 import akka.stream.scaladsl.Source
 import subbot.config.BotConfig
 import subbot.database.DBController
