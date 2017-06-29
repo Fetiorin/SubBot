@@ -23,7 +23,7 @@ object SubBotApp extends App with FBRoute {
       }.runForeach { _ => logger.info("Article scrapped") }
   }
 
-  //Http().bindAndHandle(fbRoutes, BotConfig.conn.localhost, BotConfig.conn.port)
+  Http().bindAndHandle(fbRoutes, BotConfig.conn.localhost, BotConfig.conn.port)
 
   logger.info(s"Subbot started on: ${BotConfig.conn.localhost}")
 }
