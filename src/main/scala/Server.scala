@@ -1,6 +1,5 @@
 package subbot.server
 
-
 import akka.actor.{ActorRef, ActorSystem}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
@@ -48,7 +47,6 @@ object FBServer extends LazyLogging with implicits {
     result
   }
 
-
   def verifyToken(token: String, mode: String, challenge: String):
   (StatusCode, List[HttpHeader], Option[String]) = {
     if (mode == "subscribe" && token == BotConfig.fb.verifyToken) {
@@ -58,7 +56,6 @@ object FBServer extends LazyLogging with implicits {
       (StatusCodes.Forbidden, List.empty[HttpHeader], None)
     }
   }
-
 
   def handleMessage(fbObject: FBPObject):
   (StatusCode, List[HttpHeader], Option[Either[String, String]]) = {
@@ -78,10 +75,8 @@ object FBServer extends LazyLogging with implicits {
             case _ =>
         }
     }
-
     (StatusCodes.OK, List.empty[HttpHeader], None)
   }
-
 }
 
 trait FBRoute extends LazyLogging with implicits {
@@ -105,4 +100,3 @@ trait FBRoute extends LazyLogging with implicits {
       }
   }
 }
-

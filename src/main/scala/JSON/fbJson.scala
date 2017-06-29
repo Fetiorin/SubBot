@@ -25,4 +25,3 @@ object fbJson extends DefaultJsonProtocol {
   implicit val fbPObjectFormat = jsonFormat2(FBPObject)
 
 }
-

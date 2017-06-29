@@ -82,7 +82,6 @@ object DBController {
   def subscribe(user: String, tag: String) =
     subscriptions.insert(BSONDocument("user" -> user, "tag" -> tag))
 
-
   def unsubscribe(user: String, tag: String): Future[WriteResult] =
     subscriptions.remove(BSONDocument("user" -> user, "tag" -> tag))
 

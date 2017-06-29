@@ -71,9 +71,9 @@ object SenderUtils {
   }
 
   private def searchAndReply(query: String,
-                              id: String,
-                              search: (String => Future[List[BSONDocument]]),
-                              typ: String) = search(query).map {
+                             id: String,
+                             search: (String => Future[List[BSONDocument]]),
+                             typ: String) = search(query).map {
     docs => {
       docs match {
         case Nil =>
