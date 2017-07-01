@@ -47,7 +47,7 @@ class FbHttpConnection(implicit val system: ActorSystem) extends SenderUtils wit
       case Success(response) =>
         logger.info(s"Successful response: $response")
       case Failure(ex) =>
-        logger.info(s"Response failed: $ex" )
+        logger.info(s"Response failed: $ex")
     }
     result
   }
@@ -70,16 +70,16 @@ class FbHttpConnection(implicit val system: ActorSystem) extends SenderUtils wit
     fbObject.entry.foreach {
       entry =>
         entry.messaging.foreach {
-            case FBMessageEventIn(_, senderId,_,_,Some(postback)) =>
-              moreArticles(postback.payload, senderId.id)
-            case FBMessageEventIn(_, senderId, _, Some(senderMessage), _) =>
-              senderMessage.text match {
-                case Some(text) =>
-                  replyOnMessage(text, senderId.id)
-                case None =>
-                  Future.successful(())
-              }
-            case _ =>
+          case FBMessageEventIn(_, senderId, _, _, Some(postback)) =>
+            moreArticles(postback.payload, senderId.id)
+          case FBMessageEventIn(_, senderId, _, Some(senderMessage), _) =>
+            senderMessage.text match {
+              case Some(text) =>
+                replyOnMessage(text, senderId.id)
+              case None =>
+                Future.successful(())
+            }
+          case _ =>
         }
     }
     (StatusCodes.OK, List.empty[HttpHeader], None)

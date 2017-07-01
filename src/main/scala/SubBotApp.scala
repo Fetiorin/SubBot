@@ -12,13 +12,13 @@ import subbot.utils.Article
 import subbot.utils.ScrapUtils._
 
 import scala.concurrent.duration._
+import scala.concurrent.ExecutionContext.Implicits.global
 
 object SubBotApp extends App with LazyLogging {
   val db = DBController
 
   implicit val actorSystem = ActorSystem("SubBot", ConfigFactory.load)
   implicit val materializer = ActorMaterializer()
-  import scala.concurrent.ExecutionContext.Implicits.global
 
   //creates Route and
   val fbConnection = new FbHttpConnection()

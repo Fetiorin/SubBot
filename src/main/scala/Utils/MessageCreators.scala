@@ -25,7 +25,7 @@ package object MessageCreators {
       default_action = Some(DefaultAction(
         `type` = "web_url",
         url
-        )
+      )
       )
     )
   }
@@ -56,10 +56,10 @@ package object MessageCreators {
     toBytesWrapper(
       id = id,
       message = FBMessage(attachment = Some(
-          Attachment(
+        Attachment(
           `type` = "template",
           Payload(template_type = Some("generic"),
-                  elements = Some(cards))))))
+            elements = Some(cards))))))
 
   def createMessage(text: String, id: String) = toBytesWrapper(
     id = id,

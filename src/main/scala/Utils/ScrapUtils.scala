@@ -36,6 +36,7 @@ object ScrapUtils {
         case _ => loop(pageNum + 1, links.reverse ++ acc)
       }
     }
+
     loop(1, Nil)
   }
 

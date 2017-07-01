@@ -67,17 +67,16 @@ object DBController {
   def addArticle(article: Article) = {
     val Article(title, description, url, image, tags, date) = article
     articles.insert(
-    BSONDocument(
-      "title" -> title,
-      "description" -> description,
-      "url" -> url,
-      "image" -> image,
-      "tags" -> tags,
-      "date" -> BSONDateTime(date.getMillis)
+      BSONDocument(
+        "title" -> title,
+        "description" -> description,
+        "url" -> url,
+        "image" -> image,
+        "tags" -> tags,
+        "date" -> BSONDateTime(date.getMillis)
+      )
     )
-  )
   }
-
 
   def subscribe(user: String, tag: String) =
     subscriptions.update(
@@ -90,13 +89,13 @@ object DBController {
   def lastArticle: Future[String] = {
     articles.find(BSONDocument()).
       sort(BSONDocument("date" -> -1)).
-        one[BSONDocument].map { article =>
-          val url = article.flatMap(_.get("url"))
-          url match {
-            case Some(BSONString(value)) => value
-            case _ => ""
-          }
-        }
+      one[BSONDocument].map { article =>
+      val url = article.flatMap(_.get("url"))
+      url match {
+        case Some(BSONString(value)) => value
+        case _ => ""
+      }
+    }
   }
 
   private def createConnection(location: String, dbname: String): DefaultDB = {
