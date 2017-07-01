@@ -5,6 +5,7 @@ import reactivemongo.api.collections.bson.BSONCollection
 import reactivemongo.api.commands.WriteResult
 import reactivemongo.bson.{BSONArray, BSONDateTime, BSONDocument, BSONRegex, BSONString}
 import subbot.config.BotConfig
+import subbot.utils.Article
 
 import scala.concurrent.Future
 
@@ -26,7 +27,7 @@ object DBController {
   def getSubscriptions(user: String): Future[List[BSONDocument]] = {
     subscriptions
       .find(BSONDocument("user" -> user))
-      .cursor[BSONDocument]().toList()
+      .cursor[BSONDocument]().collect[List]()
   }
 
   private def search(query: BSONDocument): Future[List[BSONDocument]] = {
@@ -63,24 +64,25 @@ object DBController {
     )
   ).cursor[BSONDocument]().collect[Set]()
 
-  def addArticle(title: String,
-                 description: String,
-                 url: String,
-                 image: String,
-                 tags: List[String],
-                 date: Long) = articles.insert(
+  def addArticle(article: Article) = {
+    val Article(title, description, url, image, tags, date) = article
+    articles.insert(
     BSONDocument(
       "title" -> title,
       "description" -> description,
       "url" -> url,
       "image" -> image,
       "tags" -> tags,
-      "date" -> BSONDateTime(date)
+      "date" -> BSONDateTime(date.getMillis)
     )
   )
+  }
+
 
   def subscribe(user: String, tag: String) =
-    subscriptions.insert(BSONDocument("user" -> user, "tag" -> tag))
+    subscriptions.update(
+      BSONDocument("user" -> user, "tag" -> tag),
+      BSONDocument("user" -> user, "tag" -> tag), upsert = true)
 
   def unsubscribe(user: String, tag: String): Future[WriteResult] =
     subscriptions.remove(BSONDocument("user" -> user, "tag" -> tag))
