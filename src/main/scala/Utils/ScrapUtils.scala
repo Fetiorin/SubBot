@@ -31,9 +31,9 @@ object ScrapUtils {
       val foundLast = links.contains(lastParsedLink)
       val redirected = canonical == overflowRedirect
       (foundLast, redirected) match {
-        case (true, _) => links.takeWhile(_ != lastParsedLink) ++ acc
+        case (true, _) => links.takeWhile(_ != lastParsedLink).reverse ++ acc
         case (_, true) => acc
-        case _ => loop(pageNum + 1, links ++ acc)
+        case _ => loop(pageNum + 1, links.reverse ++ acc)
       }
     }
     loop(1, Nil)
@@ -55,12 +55,5 @@ object ScrapUtils {
     val date: DateTime = new DateTime(time)
 
     Article(title, description, url, image, allTags, date)
-  }
-
-  def notifyUsers(article: Article) = SenderUtils.sendNotifications(article)
-
-  def addToDB(article: Article) = {
-    val Article(title, description, url, image, tags, date) = article
-    DBController.addArticle(title, description, url, image, tags, date.getMillis)
   }
 }

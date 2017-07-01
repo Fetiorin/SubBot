@@ -4,13 +4,15 @@ import reactivemongo.bson.{BSONDateTime, BSONDocument, BSONString}
 import subbot.config.BotConfig
 import subbot.database.DBController
 import subbot.json.fbmodel.{Card, DefaultAction}
-import subbot.server.FBServer
 import subbot.utils.MessageCreators._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-object SenderUtils {
+trait SenderUtils {
+
+  def singlePost(body: Array[Byte]): Future[Unit]
+
   def sendNotifications(article: Article) = {
     val Article(title, description, url, image, tags, _) = article
     val subscription = tags.map(tag => DBController.whoSubscribed(tag))
@@ -25,7 +27,7 @@ object SenderUtils {
           `type` = "web_url",
           url = url
         )))
-      FBServer.post(createCardMessage(card, id))
+      singlePost(createCardMessage(card, id))
     }
   }
 
@@ -52,21 +54,21 @@ object SenderUtils {
 
       case ("subscribe", tag) =>
         DBController.subscribe(id, tag.toLowerCase)
-        FBServer.post(createMessage(BotConfig.texts.subscribed + tag, id))
+        singlePost(createMessage(BotConfig.texts.subscribed + tag, id))
 
       case ("unsubscribe", tag) =>
         DBController.unsubscribe(id, tag.toLowerCase)
-        FBServer.post(createMessage(BotConfig.texts.unsubscribed + tag, id))
+        singlePost(createMessage(BotConfig.texts.unsubscribed + tag, id))
 
       case ("subscriptions", _) =>
         DBController.getSubscriptions(id) map { subs =>
           val tags: List[String] = subs.map { x => val BSONString(a) = x.get("tag").get; a }
-          FBServer.post(createMessage(tags.mkString(start = BotConfig.texts.allTags,
+          singlePost(createMessage(tags.mkString(start = BotConfig.texts.allTags,
             sep = ", ",
             end = "."), id))
         }
-      case ("help", _) => FBServer.post(createMessage(BotConfig.texts.help, id))
-      case _ => FBServer.post(createMessage(BotConfig.texts.error, id))
+      case ("help", _) => singlePost(createMessage(BotConfig.texts.help, id))
+      case _ => singlePost(createMessage(BotConfig.texts.error, id))
     }
   }
 
@@ -77,17 +79,20 @@ object SenderUtils {
     docs => {
       docs match {
         case Nil =>
-          FBServer.post(createMessage(BotConfig.texts.nothingFound, id))
+          println("NOTHING")
+          singlePost(createMessage(BotConfig.texts.nothingFound, id))
         case doc =>
+          println("SOMETHING")
           val articles = doc.map { article => makeCard(article.toMap) }
+          articles.foreach(println)
           val BSONDateTime(date) = docs.last.toMap("date")
           val payload = List(typ, query, date) mkString "&"
           articles.length match {
             case n if n == 10 =>
-              FBServer.post(createListMessage(articles, payload, id))
-                .map(_ => FBServer.post(createMoreButton(payload, id)))
+              singlePost(createListMessage(articles, payload, id))
+                .map(_ => singlePost(createMoreButton(payload, id)))
             case _ =>
-              FBServer.post(createListMessage(articles, payload, id))
+              singlePost(createListMessage(articles, payload, id))
           }
       }
     }
