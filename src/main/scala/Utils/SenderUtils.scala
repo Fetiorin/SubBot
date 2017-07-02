@@ -79,12 +79,9 @@ trait SenderUtils {
     docs => {
       docs match {
         case Nil =>
-          println("NOTHING")
           singlePost(createMessage(BotConfig.texts.nothingFound, id))
         case doc =>
-          println("SOMETHING")
           val articles = doc.map { article => makeCard(article.toMap) }
-          articles.foreach(println)
           val BSONDateTime(date) = docs.last.toMap("date")
           val payload = List(typ, query, date) mkString "&"
           articles.length match {
